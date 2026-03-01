@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyTestFramework\MyTestFramework.csproj" />
+    <ProjectReference Include="..\TestedApp\TestedApp.csproj" />
+  </ItemGroup>
+
+</Project>

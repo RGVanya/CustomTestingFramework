@@ -1,0 +1,11 @@
+C:\WORK\SPP\CustomTestingFramework\TestedApp\bin\Debug\net10.0\TestedApp.deps.json
+C:\WORK\SPP\CustomTestingFramework\TestedApp\bin\Debug\net10.0\TestedApp.dll
+C:\WORK\SPP\CustomTestingFramework\TestedApp\bin\Debug\net10.0\TestedApp.pdb
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.AssemblyInfoInputs.cache
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.AssemblyInfo.cs
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.csproj.CoreCompileInputs.cache
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.dll
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\refint\TestedApp.dll
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.pdb
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\ref\TestedApp.dll

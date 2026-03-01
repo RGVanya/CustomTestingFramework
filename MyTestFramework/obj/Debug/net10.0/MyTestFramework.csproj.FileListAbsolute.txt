@@ -1,0 +1,11 @@
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\bin\Debug\net10.0\MyTestFramework.deps.json
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\bin\Debug\net10.0\MyTestFramework.dll
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\bin\Debug\net10.0\MyTestFramework.pdb
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\MyTestFramework.GeneratedMSBuildEditorConfig.editorconfig
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\MyTestFramework.AssemblyInfoInputs.cache
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\MyTestFramework.AssemblyInfo.cs
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\MyTestFramework.csproj.CoreCompileInputs.cache
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\MyTestFramework.dll
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\refint\MyTestFramework.dll
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\MyTestFramework.pdb
+C:\WORK\SPP\CustomTestingFramework\MyTestFramework\obj\Debug\net10.0\ref\MyTestFramework.dll

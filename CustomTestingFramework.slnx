@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AppTests/AppTests.csproj" />
+  <Project Path="MyTestFramework/MyTestFramework.csproj" />
+  <Project Path="TestedApp/TestedApp.csproj" />
+  <Project Path="TestRunner/TestRunner.csproj" />
+</Solution>
