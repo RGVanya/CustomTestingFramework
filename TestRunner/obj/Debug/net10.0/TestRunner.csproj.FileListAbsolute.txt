@@ -20,3 +20,4 @@ C:\WORK\SPP\CustomTestingFramework\TestRunner\obj\Debug\net10.0\refint\TestRunne
 C:\WORK\SPP\CustomTestingFramework\TestRunner\obj\Debug\net10.0\TestRunner.pdb
 C:\WORK\SPP\CustomTestingFramework\TestRunner\obj\Debug\net10.0\TestRunner.genruntimeconfig.cache
 C:\WORK\SPP\CustomTestingFramework\TestRunner\obj\Debug\net10.0\ref\TestRunner.dll
+C:\WORK\SPP\CustomTestingFramework\TestRunner\obj\Debug\net10.0\TestRunner.sourcelink.json

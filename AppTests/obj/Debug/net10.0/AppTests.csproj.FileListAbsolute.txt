@@ -15,3 +15,4 @@ C:\WORK\SPP\CustomTestingFramework\AppTests\obj\Debug\net10.0\AppTests.dll
 C:\WORK\SPP\CustomTestingFramework\AppTests\obj\Debug\net10.0\refint\AppTests.dll
 C:\WORK\SPP\CustomTestingFramework\AppTests\obj\Debug\net10.0\AppTests.pdb
 C:\WORK\SPP\CustomTestingFramework\AppTests\obj\Debug\net10.0\ref\AppTests.dll
+C:\WORK\SPP\CustomTestingFramework\AppTests\obj\Debug\net10.0\AppTests.sourcelink.json

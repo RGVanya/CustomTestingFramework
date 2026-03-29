@@ -9,3 +9,4 @@ C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.dll
 C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\refint\TestedApp.dll
 C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.pdb
 C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\ref\TestedApp.dll
+C:\WORK\SPP\CustomTestingFramework\TestedApp\obj\Debug\net10.0\TestedApp.sourcelink.json
