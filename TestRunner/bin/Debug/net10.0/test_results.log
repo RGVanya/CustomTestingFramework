@@ -1,0 +1,61 @@
+Test Run Started: 29.03.2026 20:25:56
+
+Обнаружено тестовых классов: 1
+Обнаружено тестовых методов (с учётом TestCase): 21
+MaxDegreeOfParallelism: 4
+
+========== ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК ==========
+[Thread  2] AuthServiceTests.TestLoginSuccess -> PASSED (1ms) : Checking successful login
+[Thread  2] AuthServiceTests.TestLoginFail -> PASSED (3ms) : Checking failed login
+[Thread  2] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (2ms) : Parameter count mismatch.
+[Thread  2] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread  2] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[Thread  2] AuthServiceTests.TestTokenAsync -> PASSED (61ms)
+[Thread  9] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread  9] AuthServiceTests.TestNullProfile -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestConfigReference -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestContextUsage -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestSlowOperation1 -> PASSED (1000ms) : Slow test 1 — simulating heavy I/O
+[Thread  9] AuthServiceTests.TestSlowOperation2 -> PASSED (1006ms) : Slow test 2 — simulating heavy computation
+[Thread  9] AuthServiceTests.TestSlowOperation3 -> PASSED (1005ms) : Slow test 3 — simulating network call
+[Thread  9] AuthServiceTests.TestSlowOperation4 -> PASSED (1010ms) : Slow test 4 — simulating database query
+[Thread  9] AuthServiceTests.TestWithTimeoutPass -> PASSED (202ms) : Test with timeout — should pass
+[Thread  7] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (509ms) : Тест превысил таймаут 500ms
+Последовательное время: 4828ms
+
+========== ПАРАЛЛЕЛЬНЫЙ ЗАПУСК ==========
+[Thread  9] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread  9] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread  9] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (0ms) : Parameter count mismatch.
+[Thread  9] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[Thread  9] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread  9] AuthServiceTests.TestNullProfile -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestConfigReference -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestContextUsage -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestTokenAsync -> PASSED (53ms)
+[Thread  9] AuthServiceTests.TestSlowOperation1 -> PASSED (1009ms) : Slow test 1 — simulating heavy I/O
+[Thread  9] AuthServiceTests.TestSlowOperation3 -> PASSED (1009ms) : Slow test 3 — simulating network call
+[Thread  9] AuthServiceTests.TestSlowOperation2 -> PASSED (1009ms) : Slow test 2 — simulating heavy computation
+[Thread  7] AuthServiceTests.TestSlowOperation4 -> PASSED (1009ms) : Slow test 4 — simulating database query
+[Thread  5] AuthServiceTests.TestWithTimeoutPass -> PASSED (215ms) : Test with timeout — should pass
+[Thread 11] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (510ms) : Тест превысил таймаут 500ms
+Параллельное время: 1535ms
+
+========== ИТОГИ ==========
+[Последовательный] Всего: 21 | Passed: 17 | Failed: 3 | Timeout: 1 | Время: 4828ms
+[Параллельный] Всего: 21 | Passed: 17 | Failed: 3 | Timeout: 1 | Время: 1535ms
+
+Ускорение: x3,15 (параллельный быстрее в 3,15 раз)
+
+Тестирование завершено. Нажмите любую клавишу...
