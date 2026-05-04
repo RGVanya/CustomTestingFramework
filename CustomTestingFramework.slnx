@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="AppTests/AppTests.csproj" />
   <Project Path="MyTestFramework/MyTestFramework.csproj" />
+  <Project Path="MyThreadPool/MyThreadPool.csproj" Id="2c77b687-4a00-44de-90fc-45af062e5537" />
   <Project Path="TestedApp/TestedApp.csproj" />
   <Project Path="TestRunner/TestRunner.csproj" />
 </Solution>

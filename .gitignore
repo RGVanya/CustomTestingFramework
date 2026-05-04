@@ -1,0 +1,17 @@
+﻿# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Local tool/cache
+.dotnet/
+
+# Logs and generated outputs
+*.log
+TestRunner/bin/Debug/net10.0/test_results.log

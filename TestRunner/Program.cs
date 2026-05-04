@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
@@ -6,261 +6,285 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using MyTestFramework;
+using MyThreadPool;
 
-namespace TestRunner
+namespace TestRunner;
+
+internal class Program
 {
-    class Program
+    static void Main()
     {
-        static async Task Main()
+        var logger = new ThreadSafeTestLogger("test_results.log");
+
+        var testAssembly = typeof(AppTests.AuthServiceTests).Assembly;
+        var testClasses = testAssembly.GetTypes()
+            .Where(t => t.GetCustomAttribute<TestClassAttribute>() is not null)
+            .ToList();
+
+        var baseItems = CollectTestItems(testClasses);
+        logger.LogInfo($"Найдено тестовых классов: {testClasses.Count}");
+        logger.LogInfo($"Найдено тестовых методов (c учетом TestCase): {baseItems.Count}");
+
+        var plan = BuildLoadPlan(baseItems, requiredRuns: 50);
+        logger.LogInfo($"Сформировано запусков тестов: {plan.TotalItems}");
+
+        var results = new ConcurrentBag<TestResult>();
+        var remaining = new CountdownEvent(plan.TotalItems);
+
+        using var pool = new DynamicThreadPool(
+            minWorkers: 2,
+            maxWorkers: 8,
+            idleTimeout: TimeSpan.FromSeconds(3),
+            scaleCheckInterval: TimeSpan.FromMilliseconds(500),
+            queueWaitScaleThreshold: TimeSpan.FromMilliseconds(700),
+            hungTaskThreshold: TimeSpan.FromSeconds(5),
+            log: logger.LogInfo);
+
+        using var monitorStop = new CancellationTokenSource();
+        var monitor = new Thread(() => MonitorPoolLoop(pool, logger, monitorStop.Token))
         {
-            // [ДОБАВЛЕНО] Конфигурация: задаём максимальное количество одновременно выполняемых тестов.
-            var config = new TestConfiguration
+            IsBackground = true,
+            Name = "PoolMonitor"
+        };
+        monitor.Start();
+
+        var totalSw = Stopwatch.StartNew();
+
+        foreach (var batch in plan.Batches)
+        {
+            foreach (var item in batch.Items)
             {
-                MaxDegreeOfParallelism = 4
-            };
+                pool.Enqueue(() =>
+                {
+                    try
+                    {
+                        var result = ExecuteSingleTest(item);
+                        results.Add(result);
+                        logger.LogResult(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogInfo($"[RUNNER][ERROR] {item.ClassType.Name}.{item.Method.Name}: {ex.Message}");
+                    }
+                    finally
+                    {
+                        remaining.Signal();
+                    }
+                });
+            }
 
-            // [ДОБАВЛЕНО] Потокобезопасный логгер — синхронизирует вывод в консоль и пишет в файл.
-            var logger = new ThreadSafeTestLogger("test_results.log");
-
-            var testAssembly = typeof(AppTests.AuthServiceTests).Assembly;
-
-            var testClasses = testAssembly.GetTypes()
-                .Where(t => t.GetCustomAttribute<TestClassAttribute>() != null)
-                .ToList();
-
-            // Собираем все тестовые задания (класс + метод + аргументы) в единый список
-            var allTestItems = CollectTestItems(testClasses);
-
-            logger.LogInfo($"Обнаружено тестовых классов: {testClasses.Count}");
-            logger.LogInfo($"Обнаружено тестовых методов (с учётом TestCase): {allTestItems.Count}");
-            logger.LogInfo($"MaxDegreeOfParallelism: {config.MaxDegreeOfParallelism}");
-
-            // ====================================================================
-            // [ДОБАВЛЕНО] СРАВНЕНИЕ ЭФФЕКТИВНОСТИ: сначала последовательный запуск,
-            // затем параллельный. Время обоих запусков выводится для наглядности.
-            // ====================================================================
-
-            // --- Последовательный запуск ---
-            logger.LogInfo("\n========== ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК ==========");
-            var sequentialResults = await RunTestsSequentially(allTestItems, logger);
-            var sequentialTime = sequentialResults.totalMs;
-
-            // --- Параллельный запуск ---
-            logger.LogInfo("\n========== ПАРАЛЛЕЛЬНЫЙ ЗАПУСК ==========");
-            var parallelResults = await RunTestsInParallel(allTestItems, config, logger);
-            var parallelTime = parallelResults.totalMs;
-
-            // --- Итоги ---
-            logger.LogInfo("\n========== ИТОГИ ==========");
-            PrintSummary(sequentialResults.results, "Последовательный", sequentialTime, logger);
-            PrintSummary(parallelResults.results, "Параллельный", parallelTime, logger);
-
-            double speedup = sequentialTime > 0 ? (double)sequentialTime / parallelTime : 1;
-            logger.LogInfo($"\nУскорение: x{speedup:F2} (параллельный быстрее в {speedup:F2} раз)");
-
-            logger.LogInfo("\nТестирование завершено. Нажмите любую клавишу...");
-            Console.ReadKey();
+            if (batch.DelayAfterMs > 0)
+            {
+                Thread.Sleep(batch.DelayAfterMs);
+            }
         }
 
-        // [ДОБАВЛЕНО] Сбор всех тестовых элементов из всех классов в единый плоский список.
-        // Каждый элемент — это (тип класса, метод, аргументы).
-        static List<TestItem> CollectTestItems(List<Type> testClasses)
+        remaining.Wait();
+        totalSw.Stop();
+
+        monitorStop.Cancel();
+        monitor.Join(TimeSpan.FromSeconds(2));
+
+        var finalResults = results.ToList();
+        PrintSummary(finalResults, totalSw.ElapsedMilliseconds, logger);
+        logger.LogInfo("Демонстрация динамического пула завершена.");
+    }
+
+    static void MonitorPoolLoop(DynamicThreadPool pool, ThreadSafeTestLogger logger, CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
         {
-            var items = new List<TestItem>();
+            var snapshot = pool.GetSnapshot();
+            logger.LogInfo($"[MONITOR] queue={snapshot.QueueLength}, active={snapshot.ActiveWorkers}, busy={snapshot.BusyWorkers}, idle={snapshot.IdleWorkers}");
+            Thread.Sleep(1000);
+        }
+    }
 
-            foreach (var type in testClasses)
+    static LoadPlan BuildLoadPlan(List<TestItem> baseItems, int requiredRuns)
+    {
+        var batches = new List<LoadBatch>();
+        var generated = new List<TestItem>(requiredRuns);
+
+        int cycleIndex = 0;
+        while (generated.Count < requiredRuns)
+        {
+            generated.Add(baseItems[cycleIndex % baseItems.Count]);
+            cycleIndex++;
+        }
+
+        var idx = 0;
+
+        // Одиночные подачи
+        for (var i = 0; i < 8 && idx < generated.Count; i++)
+        {
+            batches.Add(new LoadBatch(new[] { generated[idx++] }, DelayAfterMs: 450));
+        }
+
+        // Пиковая нагрузка
+        while (idx < generated.Count)
+        {
+            var take = Math.Min(10, generated.Count - idx);
+            batches.Add(new LoadBatch(generated.Skip(idx).Take(take).ToArray(), DelayAfterMs: 100));
+            idx += take;
+
+            // Период бездействия между волнами
+            if (idx < generated.Count)
             {
-                var methods = type.GetMethods();
-                foreach (var method in methods)
+                batches.Add(new LoadBatch(Array.Empty<TestItem>(), DelayAfterMs: 2200));
+            }
+        }
+
+        return new LoadPlan(batches, generated.Count);
+    }
+
+    static List<TestItem> CollectTestItems(List<Type> testClasses)
+    {
+        var items = new List<TestItem>();
+
+        foreach (var type in testClasses)
+        {
+            foreach (var method in type.GetMethods())
+            {
+                var testAttr = method.GetCustomAttribute<TestMethodAttribute>();
+                var testCases = method.GetCustomAttributes<TestCaseAttribute>().ToList();
+
+                if (testAttr is null && !testCases.Any())
                 {
-                    var testAttr = method.GetCustomAttribute<TestMethodAttribute>();
-                    var testCases = method.GetCustomAttributes<TestCaseAttribute>().ToList();
+                    continue;
+                }
 
-                    if (testAttr != null || testCases.Any())
+                var cases = testCases.Any()
+                    ? testCases.Select(c => c.Parameters).ToList()
+                    : new List<object[]?> { null };
+
+                foreach (var args in cases)
+                {
+                    items.Add(new TestItem
                     {
-                        var cases = testCases.Any()
-                            ? testCases.Select(c => c.Parameters).ToList()
-                            : new List<object[]> { null! };
-
-                        foreach (var args in cases)
-                        {
-                            items.Add(new TestItem
-                            {
-                                ClassType = type,
-                                Method = method,
-                                TestAttribute = testAttr,
-                                Arguments = args,
-                                TimeoutMs = method.GetCustomAttribute<TimeoutAttribute>()?.Milliseconds
-                            });
-                        }
-                    }
+                        ClassType = type,
+                        Method = method,
+                        TestAttribute = testAttr,
+                        Arguments = args,
+                        TimeoutMs = method.GetCustomAttribute<TimeoutAttribute>()?.Milliseconds
+                    });
                 }
             }
-            return items;
         }
 
-        // [ДОБАВЛЕНО] Последовательный запуск всех тестов — для сравнения с параллельным.
-        static async Task<(List<TestResult> results, long totalMs)> RunTestsSequentially(
-            List<TestItem> items, ThreadSafeTestLogger logger)
+        return items;
+    }
+
+    static TestResult ExecuteSingleTest(TestItem item)
+    {
+        var result = new TestResult
         {
-            var results = new List<TestResult>();
-            var sw = Stopwatch.StartNew();
+            ClassName = item.ClassType.Name,
+            MethodName = item.Method.Name,
+            Arguments = item.Arguments is not null ? string.Join(",", item.Arguments) : "",
+            ThreadId = Environment.CurrentManagedThreadId
+        };
 
-            foreach (var item in items)
-            {
-                var result = await ExecuteSingleTest(item);
-                results.Add(result);
-                logger.LogResult(result);
-            }
+        var sw = Stopwatch.StartNew();
 
-            sw.Stop();
-            logger.LogInfo($"Последовательное время: {sw.ElapsedMilliseconds}ms");
-            return (results, sw.ElapsedMilliseconds);
-        }
-
-        // [ДОБАВЛЕНО] Параллельный запуск всех тестов с ограничением степени параллелизма.
-        // Использует SemaphoreSlim для контроля количества одновременных потоков
-        // и Task.WhenAll для ожидания завершения всех тестов.
-        // Параллелизм реализован на уровне методов: каждый тестовый метод запускается
-        // как отдельная задача (Task), независимо от того, к какому классу он принадлежит.
-        static async Task<(List<TestResult> results, long totalMs)> RunTestsInParallel(
-            List<TestItem> items, TestConfiguration config, ThreadSafeTestLogger logger)
+        try
         {
-            var results = new ConcurrentBag<TestResult>();
-            var semaphore = new SemaphoreSlim(config.MaxDegreeOfParallelism);
-            var sw = Stopwatch.StartNew();
+            var testContext = new TestContext();
+            object instance;
 
-            var tasks = items.Select(async item =>
+            var ctorWithContext = item.ClassType.GetConstructors()
+                .FirstOrDefault(c => c.GetParameters().Length == 1 && c.GetParameters()[0].ParameterType == typeof(TestContext));
+
+            instance = ctorWithContext is not null
+                ? Activator.CreateInstance(item.ClassType, testContext)!
+                : Activator.CreateInstance(item.ClassType)!;
+
+            var beforeEach = item.ClassType.GetMethods().FirstOrDefault(m => m.GetCustomAttribute<BeforeEachAttribute>() is not null);
+            var afterEach = item.ClassType.GetMethods().FirstOrDefault(m => m.GetCustomAttribute<AfterEachAttribute>() is not null);
+
+            beforeEach?.Invoke(instance, null);
+
+            Exception? executionException = null;
+            var worker = new Thread(() =>
             {
-                await semaphore.WaitAsync();
                 try
                 {
-                    var result = await ExecuteSingleTest(item);
-                    results.Add(result);
-                    logger.LogResult(result);
+                    var raw = item.Method.Invoke(instance, item.Arguments);
+                    if (raw is Task task)
+                    {
+                        task.GetAwaiter().GetResult();
+                    }
                 }
-                finally
+                catch (TargetInvocationException tie)
                 {
-                    semaphore.Release();
+                    executionException = tie.InnerException ?? tie;
                 }
-            });
-
-            await Task.WhenAll(tasks);
-
-            sw.Stop();
-            logger.LogInfo($"Параллельное время: {sw.ElapsedMilliseconds}ms");
-            return (results.ToList(), sw.ElapsedMilliseconds);
-        }
-
-        // [ДОБАВЛЕНО] Запуск одного теста с поддержкой таймаута.
-        // Если на методе есть атрибут [Timeout(ms)], тест выполняется с ограничением.
-        // При превышении таймаута — отмена через CancellationToken и статус TIMEOUT.
-        static async Task<TestResult> ExecuteSingleTest(TestItem item)
-        {
-            var result = new TestResult
+                catch (Exception ex)
+                {
+                    executionException = ex;
+                }
+            })
             {
-                ClassName = item.ClassType.Name,
-                MethodName = item.Method.Name,
-                Arguments = item.Arguments != null ? string.Join(",", item.Arguments) : "",
-                ThreadId = Environment.CurrentManagedThreadId
+                IsBackground = true,
+                Name = $"TestExec-{item.ClassType.Name}.{item.Method.Name}"
             };
 
-            var stopwatch = Stopwatch.StartNew();
+            worker.Start();
 
-            try
+            var timeoutMs = item.TimeoutMs ?? Timeout.Infinite;
+            var finished = worker.Join(timeoutMs);
+            if (!finished)
             {
-                var testContext = new TestContext();
-
-                object instance;
-                var ctors = item.ClassType.GetConstructors();
-                if (ctors.Any(c => c.GetParameters().Length == 1 && c.GetParameters()[0].ParameterType == typeof(TestContext)))
-                    instance = Activator.CreateInstance(item.ClassType, testContext)!;
-                else
-                    instance = Activator.CreateInstance(item.ClassType)!;
-
-                // BeforeEach
-                var beforeEach = item.ClassType.GetMethods()
-                    .FirstOrDefault(m => m.GetCustomAttribute<BeforeEachAttribute>() != null);
-                beforeEach?.Invoke(instance, null);
-
-                // [ДОБАВЛЕНО] Выполнение теста с таймаутом через Task.Run + CancellationTokenSource.
-                // Если таймаут задан — тест оборачивается в Task.WhenAny с Task.Delay.
-                if (item.TimeoutMs.HasValue)
-                {
-                    using var cts = new CancellationTokenSource();
-                    var testTask = Task.Run(async () =>
-                    {
-                        object res = item.Method.Invoke(instance, item.Arguments);
-                        if (res is Task t) await t;
-                    }, cts.Token);
-
-                    var timeoutTask = Task.Delay(item.TimeoutMs.Value, cts.Token);
-
-                    var completed = await Task.WhenAny(testTask, timeoutTask);
-                    if (completed == timeoutTask)
-                    {
-                        cts.Cancel();
-                        stopwatch.Stop();
-                        result.Status = TestStatus.Timeout;
-                        result.Message = $"Тест превысил таймаут {item.TimeoutMs}ms";
-                        result.ElapsedMs = stopwatch.ElapsedMilliseconds;
-
-                        var afterEach = item.ClassType.GetMethods()
-                            .FirstOrDefault(m => m.GetCustomAttribute<AfterEachAttribute>() != null);
-                        afterEach?.Invoke(instance, null);
-                        return result;
-                    }
-
-                    await testTask;
-                }
-                else
-                {
-                    object res = item.Method.Invoke(instance, item.Arguments)!;
-                    if (res is Task t) await t;
-                }
-
-                stopwatch.Stop();
-                result.Status = TestStatus.Passed;
-                result.Message = item.TestAttribute?.Description ?? "";
-                result.ElapsedMs = stopwatch.ElapsedMilliseconds;
-
-                // AfterEach
-                var afterEachMethod = item.ClassType.GetMethods()
-                    .FirstOrDefault(m => m.GetCustomAttribute<AfterEachAttribute>() != null);
-                afterEachMethod?.Invoke(instance, null);
-            }
-            catch (Exception ex)
-            {
-                stopwatch.Stop();
-                result.Status = TestStatus.Failed;
-                result.Message = ex.InnerException?.Message ?? ex.Message;
-                result.ElapsedMs = stopwatch.ElapsedMilliseconds;
+                sw.Stop();
+                result.Status = TestStatus.Timeout;
+                result.Message = $"Тест превысил таймаут {item.TimeoutMs}ms";
+                result.ElapsedMs = sw.ElapsedMilliseconds;
+                afterEach?.Invoke(instance, null);
+                return result;
             }
 
-            return result;
+            if (executionException is not null)
+            {
+                throw executionException;
+            }
+
+            sw.Stop();
+            result.Status = TestStatus.Passed;
+            result.Message = item.TestAttribute?.Description ?? "";
+            result.ElapsedMs = sw.ElapsedMilliseconds;
+
+            afterEach?.Invoke(instance, null);
         }
-
-        static void PrintSummary(List<TestResult> results, string mode, long totalMs,
-            ThreadSafeTestLogger logger)
+        catch (Exception ex)
         {
-            int passed = results.Count(r => r.Status == TestStatus.Passed);
-            int failed = results.Count(r => r.Status == TestStatus.Failed);
-            int timeout = results.Count(r => r.Status == TestStatus.Timeout);
-
-            logger.LogInfo($"[{mode}] Всего: {results.Count} | " +
-                           $"Passed: {passed} | Failed: {failed} | Timeout: {timeout} | " +
-                           $"Время: {totalMs}ms");
+            sw.Stop();
+            result.Status = TestStatus.Failed;
+            result.Message = ex.Message;
+            result.ElapsedMs = sw.ElapsedMilliseconds;
         }
+
+        return result;
     }
 
-    // [ДОБАВЛЕНО] Вспомогательная структура для описания одного тестового элемента.
-    // Хранит всю необходимую информацию для запуска конкретного теста.
-    class TestItem
+    static void PrintSummary(List<TestResult> results, long totalMs, ThreadSafeTestLogger logger)
     {
-        public Type ClassType { get; set; } = null!;
-        public MethodInfo Method { get; set; } = null!;
-        public TestMethodAttribute? TestAttribute { get; set; }
-        public object[]? Arguments { get; set; }
-        public int? TimeoutMs { get; set; }
+        var passed = results.Count(r => r.Status == TestStatus.Passed);
+        var failed = results.Count(r => r.Status == TestStatus.Failed);
+        var timeout = results.Count(r => r.Status == TestStatus.Timeout);
+
+        logger.LogInfo("\nИТОГИ");
+        logger.LogInfo($"Всего: {results.Count} | Passed: {passed} | Failed: {failed} | Timeout: {timeout} | Время: {totalMs}ms");
     }
 }
+
+internal sealed class TestItem
+{
+    public required Type ClassType { get; init; }
+    public required MethodInfo Method { get; init; }
+    public TestMethodAttribute? TestAttribute { get; init; }
+    public object[]? Arguments { get; init; }
+    public int? TimeoutMs { get; init; }
+}
+
+internal sealed record LoadBatch(IReadOnlyList<TestItem> Items, int DelayAfterMs);
+internal sealed record LoadPlan(IReadOnlyList<LoadBatch> Batches, int TotalItems);
+

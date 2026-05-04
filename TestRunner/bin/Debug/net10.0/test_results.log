@@ -1,61 +1,82 @@
-Test Run Started: 29.03.2026 20:25:56
+Test Run Started: 04.05.2026 23:40:08
 
-Обнаружено тестовых классов: 1
-Обнаружено тестовых методов (с учётом TestCase): 21
-MaxDegreeOfParallelism: 4
+Найдено тестовых классов: 1
+Найдено тестовых методов (c учетом TestCase): 21
+Сформировано запусков тестов: 50
+[POOL] Worker 1 created (initial). Active=1 Queue=0
+[POOL] Worker 2 created (initial). Active=2 Queue=0
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 10] AuthServiceTests.TestLoginSuccess -> PASSED (36ms) : Checking successful login
+[Thread 11] AuthServiceTests.TestLoginFail -> PASSED (3ms) : Checking failed login
+[Thread 10] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (14ms) : Parameter count mismatch.
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 11] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (1ms)
+[Thread 10] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (13ms) : Expected True, but got False
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 11] AuthServiceTests.TestTokenAsync -> PASSED (77ms)
+[Thread 10] AuthServiceTests.TestException -> PASSED (2ms)
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 11] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 10] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 11] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (1ms) : Checking disk space calculation with different inputs
+[Thread 10] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread 11] AuthServiceTests.TestNullProfile -> PASSED (0ms)
+[Thread 10] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
+[Thread 11] AuthServiceTests.TestConfigReference -> PASSED (0ms)
+[Thread 10] AuthServiceTests.TestContextUsage -> PASSED (0ms)
+[MONITOR] queue=1, active=2, busy=2, idle=0
+[POOL] Worker 3 created (scale-up). Active=3 Queue=1
+[Thread 11] AuthServiceTests.TestSlowOperation1 -> PASSED (1002ms) : Slow test 1 — simulating heavy I/O
+[Thread 10] AuthServiceTests.TestSlowOperation2 -> PASSED (1001ms) : Slow test 2 — simulating heavy computation
+[MONITOR] queue=0, active=3, busy=1, idle=2
+[Thread 33] AuthServiceTests.TestSlowOperation3 -> PASSED (1008ms) : Slow test 3 — simulating network call
+[MONITOR] queue=7, active=3, busy=3, idle=0
+[POOL] Worker 4 created (scale-up). Active=4 Queue=7
+[Thread 38] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 38] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 38] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (0ms) : Parameter count mismatch.
+[Thread 38] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread 38] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[Thread 38] AuthServiceTests.TestTokenAsync -> PASSED (53ms)
+[Thread 38] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 11] AuthServiceTests.TestWithTimeoutPass -> PASSED (212ms) : Test with timeout — should pass
+[Thread 33] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (502ms) : Тест превысил таймаут 500ms
+[Thread 10] AuthServiceTests.TestSlowOperation4 -> PASSED (1007ms) : Slow test 4 — simulating database query
+[MONITOR] queue=0, active=4, busy=0, idle=4
+[MONITOR] queue=0, active=4, busy=0, idle=4
+[Thread 10] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 38] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 11] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 33] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread 10] AuthServiceTests.TestNullProfile -> PASSED (0ms)
+[Thread 38] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
+[Thread 11] AuthServiceTests.TestConfigReference -> PASSED (0ms)
+[Thread 33] AuthServiceTests.TestContextUsage -> PASSED (0ms)
+[MONITOR] queue=0, active=4, busy=2, idle=2
+[Thread 38] AuthServiceTests.TestSlowOperation2 -> PASSED (1005ms) : Slow test 2 — simulating heavy computation
+[Thread 10] AuthServiceTests.TestSlowOperation1 -> PASSED (1006ms) : Slow test 1 — simulating heavy I/O
+[MONITOR] queue=0, active=4, busy=0, idle=4
+[POOL] Worker 5 created (scale-up). Active=5 Queue=6
+[Thread 60] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 60] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 60] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (0ms) : Parameter count mismatch.
+[Thread 60] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread 60] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[Thread 60] AuthServiceTests.TestTokenAsync -> PASSED (54ms)
+[Thread 11] AuthServiceTests.TestWithTimeoutPass -> PASSED (212ms) : Test with timeout — should pass
+[Thread 33] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (503ms) : Тест превысил таймаут 500ms
+[MONITOR] queue=0, active=5, busy=2, idle=3
+[Thread 10] AuthServiceTests.TestSlowOperation4 -> PASSED (1003ms) : Slow test 4 — simulating database query
+[Thread 38] AuthServiceTests.TestSlowOperation3 -> PASSED (1003ms) : Slow test 3 — simulating network call
+[MONITOR] queue=0, active=5, busy=0, idle=5
+[Thread 60] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 33] AuthServiceTests.TestException -> PASSED (0ms)
 
-========== ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК ==========
-[Thread  2] AuthServiceTests.TestLoginSuccess -> PASSED (1ms) : Checking successful login
-[Thread  2] AuthServiceTests.TestLoginFail -> PASSED (3ms) : Checking failed login
-[Thread  2] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (2ms) : Parameter count mismatch.
-[Thread  2] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
-[Thread  2] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
-[Thread  2] AuthServiceTests.TestTokenAsync -> PASSED (61ms)
-[Thread  9] AuthServiceTests.TestException -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread  9] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread  9] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread  9] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
-[Thread  9] AuthServiceTests.TestNullProfile -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestConfigReference -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestContextUsage -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestSlowOperation1 -> PASSED (1000ms) : Slow test 1 — simulating heavy I/O
-[Thread  9] AuthServiceTests.TestSlowOperation2 -> PASSED (1006ms) : Slow test 2 — simulating heavy computation
-[Thread  9] AuthServiceTests.TestSlowOperation3 -> PASSED (1005ms) : Slow test 3 — simulating network call
-[Thread  9] AuthServiceTests.TestSlowOperation4 -> PASSED (1010ms) : Slow test 4 — simulating database query
-[Thread  9] AuthServiceTests.TestWithTimeoutPass -> PASSED (202ms) : Test with timeout — should pass
-[Thread  7] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (509ms) : Тест превысил таймаут 500ms
-Последовательное время: 4828ms
-
-========== ПАРАЛЛЕЛЬНЫЙ ЗАПУСК ==========
-[Thread  9] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
-[Thread  9] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
-[Thread  9] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (0ms) : Parameter count mismatch.
-[Thread  9] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
-[Thread  9] AuthServiceTests.TestException -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread  9] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread  9] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread  9] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
-[Thread  9] AuthServiceTests.TestNullProfile -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestConfigReference -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestContextUsage -> PASSED (0ms)
-[Thread  9] AuthServiceTests.TestTokenAsync -> PASSED (53ms)
-[Thread  9] AuthServiceTests.TestSlowOperation1 -> PASSED (1009ms) : Slow test 1 — simulating heavy I/O
-[Thread  9] AuthServiceTests.TestSlowOperation3 -> PASSED (1009ms) : Slow test 3 — simulating network call
-[Thread  9] AuthServiceTests.TestSlowOperation2 -> PASSED (1009ms) : Slow test 2 — simulating heavy computation
-[Thread  7] AuthServiceTests.TestSlowOperation4 -> PASSED (1009ms) : Slow test 4 — simulating database query
-[Thread  5] AuthServiceTests.TestWithTimeoutPass -> PASSED (215ms) : Test with timeout — should pass
-[Thread 11] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (510ms) : Тест превысил таймаут 500ms
-Параллельное время: 1535ms
-
-========== ИТОГИ ==========
-[Последовательный] Всего: 21 | Passed: 17 | Failed: 3 | Timeout: 1 | Время: 4828ms
-[Параллельный] Всего: 21 | Passed: 17 | Failed: 3 | Timeout: 1 | Время: 1535ms
-
-Ускорение: x3,15 (параллельный быстрее в 3,15 раз)
-
-Тестирование завершено. Нажмите любую клавишу...
+ИТОГИ
+Всего: 50 | Passed: 40 | Failed: 8 | Timeout: 2 | Время: 13021ms
+Демонстрация динамического пула завершена.
+[POOL] Worker 1 stopped. Active=4
+[POOL] Worker 5 stopped. Active=3
+[POOL] Worker 2 stopped. Active=2
+[POOL] Worker 3 stopped. Active=1
+[POOL] Worker 4 stopped. Active=0

@@ -3,7 +3,7 @@ using TestedApp;
 
 namespace AppTests
 {
-    // [ДОБАВЛЕНО] Атрибут [Parallelizable] — разрешает запуск методов этого класса параллельно.
+    // Атрибут [Parallelizable] — разрешает запуск методов этого класса параллельно.
     [TestClass]
     [Parallelizable]
     public class AuthServiceTests
@@ -108,7 +108,7 @@ namespace AppTests
             Assert.IsNotNull(time);
         }
 
-        // [ДОБАВЛЕНО] Медленные тесты — имитируют длительные операции (Task.Delay).
+        
         // Именно на них видна разница между последовательным и параллельным запуском:
         // последовательно = ~4с суммарно, параллельно = ~1с (при 4 потоках).
         [TestMethod("Slow test 1 — simulating heavy I/O")]
@@ -139,7 +139,7 @@ namespace AppTests
             Assert.IsFalse(false);
         }
 
-        // [ДОБАВЛЕНО] Тест с атрибутом [Timeout] — ограничение времени выполнения.
+        
         // Этот тест завершится за 200мс, таймаут 2000мс — успеет пройти.
         [TestMethod("Test with timeout — should pass")]
         [Timeout(2000)]
@@ -149,8 +149,8 @@ namespace AppTests
             Assert.IsTrue(true);
         }
 
-        // [ДОБАВЛЕНО] Тест, который ПРЕВЫСИТ таймаут и будет принудительно прерван.
-        // Задержка 5000мс при таймауте 500мс → статус TIMEOUT.
+        
+        // Задержка 5000мс при таймауте 500мс - статус TIMEOUT.
         [TestMethod("Test with timeout — should timeout")]
         [Timeout(500)]
         public async Task TestWithTimeoutFail()

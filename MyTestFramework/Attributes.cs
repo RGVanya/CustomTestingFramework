@@ -24,8 +24,7 @@ namespace MyTestFramework
     [AttributeUsage(AttributeTargets.Method)] public class BeforeEachAttribute : Attribute { }
     [AttributeUsage(AttributeTargets.Method)] public class AfterEachAttribute : Attribute { }
 
-    // [ДОБАВЛЕНО] Атрибут для ограничения времени выполнения теста.
-    // Если тест не завершился за указанное количество миллисекунд — он принудительно прерывается.
+    // Атрибут для ограничения времени выполнения теста.
     [AttributeUsage(AttributeTargets.Method)]
     public class TimeoutAttribute : Attribute
     {
@@ -33,7 +32,7 @@ namespace MyTestFramework
         public TimeoutAttribute(int milliseconds) => Milliseconds = milliseconds;
     }
 
-    // [ДОБАВЛЕНО] Атрибут для управления параллельным выполнением на уровне класса.
+    // Атрибут для управления параллельным выполнением на уровне класса.
     // Позволяет включать/отключать параллелизм методов внутри тестового класса.
     [AttributeUsage(AttributeTargets.Class)]
     public class ParallelizableAttribute : Attribute { }

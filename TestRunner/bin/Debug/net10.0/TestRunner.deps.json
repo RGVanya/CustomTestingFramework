@@ -9,7 +9,9 @@
       "TestRunner/1.0.0": {
         "dependencies": {
           "AppTests": "1.0.0",
-          "MyTestFramework": "1.0.0"
+          "MyTestFramework": "1.0.0",
+          "MyThreadPool": "1.0.0",
+          "TestedApp": "1.0.0"
         },
         "runtime": {
           "TestRunner.dll": {}
@@ -30,6 +32,17 @@
       "MyTestFramework/1.0.0": {
         "runtime": {
           "MyTestFramework.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "MyThreadPool/1.0.0": {
+        "dependencies": {
+          "AppTests": "1.0.0"
+        },
+        "runtime": {
+          "MyThreadPool.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -57,6 +70,11 @@
       "sha512": ""
     },
     "MyTestFramework/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MyThreadPool/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

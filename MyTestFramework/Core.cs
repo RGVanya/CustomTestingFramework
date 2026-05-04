@@ -17,18 +17,17 @@ namespace MyTestFramework
         public T Get<T>(string key) => (T)_data[key];
     }
 
-    // [ДОБАВЛЕНО] Конфигурация тестов — позволяет задать максимальную степень параллелизма.
-    // MaxDegreeOfParallelism ограничивает количество одновременно выполняемых тестов.
+    
+    // ограничивает количество одновременно выполняемых тестов.
     public class TestConfiguration
     {
         public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
     }
 
-    // [ДОБАВЛЕНО] Перечисление статусов результата теста.
+    // статусы результата теста.
     public enum TestStatus { Passed, Failed, Timeout }
 
-    // [ДОБАВЛЕНО] Структура для хранения результата одного теста.
-    // Используется для сбора результатов из параллельных потоков.
+    // Структура для хранения результата одного теста.
     public class TestResult
     {
         public string ClassName { get; set; } = "";
@@ -40,9 +39,7 @@ namespace MyTestFramework
         public long ElapsedMs { get; set; }
     }
 
-    // [ДОБАВЛЕНО] Потокобезопасный логгер для вывода результатов тестирования.
-    // Использует lock для синхронизации записи в консоль и файл,
-    // чтобы результаты из разных потоков не перемешивались.
+    // Использует lock для синхронизации записи в консоль,
     public class ThreadSafeTestLogger
     {
         private readonly object _lock = new();
