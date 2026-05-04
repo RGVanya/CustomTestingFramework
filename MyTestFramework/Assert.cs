@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace MyTestFramework
@@ -48,6 +49,50 @@ namespace MyTestFramework
             try { action(); }
             catch (T) { return; }
             throw new MyAssertException($"Expected exception {typeof(T).Name} was not thrown");
+        }
+
+        public static void That(Expression<Func<bool>> expression)
+        {
+            if (expression is null) throw new ArgumentNullException(nameof(expression));
+
+            bool result;
+            try
+            {
+                result = expression.Compile().Invoke();
+            }
+            catch (Exception ex)
+            {
+                throw new MyAssertException($"Expression threw exception: {ex.Message}");
+            }
+
+            if (result) return;
+
+            var details = DescribeExpression(expression.Body);
+            throw new MyAssertException($"Expression assertion failed. {details}");
+        }
+
+        private static string DescribeExpression(Expression expr)
+        {
+            if (expr is BinaryExpression binary)
+            {
+                var left = TryEvaluate(binary.Left);
+                var right = TryEvaluate(binary.Right);
+                return $"Left={left}, Operator={binary.NodeType}, Right={right}, Structure={binary}";
+            }
+
+            return $"Structure={expr}";
+        }
+
+        private static object? TryEvaluate(Expression expr)
+        {
+            try
+            {
+                return Expression.Lambda(expr).Compile().DynamicInvoke();
+            }
+            catch
+            {
+                return "<unavailable>";
+            }
         }
     }
 }

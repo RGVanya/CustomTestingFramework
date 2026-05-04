@@ -1,82 +1,217 @@
-Test Run Started: 04.05.2026 23:40:08
+Test Run Started: 05.05.2026 0:09:10
 
 Найдено тестовых классов: 1
-Найдено тестовых методов (c учетом TestCase): 21
+Найдено тестовых методов/кейсов всего: 22
+
+===== SCENARIO 1: Smoke+Load+Priority<=2+Author=Student =====
+После фильтрации (делегат): 20
 Сформировано запусков тестов: 50
 [POOL] Worker 1 created (initial). Active=1 Queue=0
 [POOL] Worker 2 created (initial). Active=2 Queue=0
+[MONITOR] queue=0, active=2, busy=1, idle=1
+[Thread 10] AuthServiceTests.TestLoginSuccess -> PASSED (2ms) : Checking successful login
+[Thread  9] AuthServiceTests.TestLoginFail -> PASSED (3ms) : Checking failed login
+[Thread  9] AuthServiceTests.TestLoginParameterized(admin,wrong,False) -> PASSED (1ms)
 [MONITOR] queue=0, active=2, busy=0, idle=2
-[Thread 10] AuthServiceTests.TestLoginSuccess -> PASSED (36ms) : Checking successful login
-[Thread 11] AuthServiceTests.TestLoginFail -> PASSED (3ms) : Checking failed login
-[Thread 10] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (14ms) : Parameter count mismatch.
+[Thread 10] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (1ms)
+[Thread  9] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (3ms) : Expected True, but got False
 [MONITOR] queue=0, active=2, busy=0, idle=2
-[Thread 11] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (1ms)
-[Thread 10] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (13ms) : Expected True, but got False
+[Thread 10] AuthServiceTests.TestTokenAsync -> PASSED (63ms)
+[Thread  9] AuthServiceTests.TestException -> PASSED (1ms)
 [MONITOR] queue=0, active=2, busy=0, idle=2
-[Thread 11] AuthServiceTests.TestTokenAsync -> PASSED (77ms)
-[Thread 10] AuthServiceTests.TestException -> PASSED (2ms)
-[MONITOR] queue=0, active=2, busy=0, idle=2
-[Thread 11] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread 10] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread 11] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (1ms) : Checking disk space calculation with different inputs
-[Thread 10] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
-[Thread 11] AuthServiceTests.TestNullProfile -> PASSED (0ms)
-[Thread 10] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
-[Thread 11] AuthServiceTests.TestConfigReference -> PASSED (0ms)
-[Thread 10] AuthServiceTests.TestContextUsage -> PASSED (0ms)
+[Thread 10] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (1ms) : Checking disk space calculation with different inputs
+[Thread 10] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (1ms) : Checking disk space calculation with different inputs
+[Thread  9] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread 10] AuthServiceTests.TestNullProfile -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
+[Thread 10] AuthServiceTests.TestConfigReference -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestContextUsage -> PASSED (0ms)
 [MONITOR] queue=1, active=2, busy=2, idle=0
 [POOL] Worker 3 created (scale-up). Active=3 Queue=1
-[Thread 11] AuthServiceTests.TestSlowOperation1 -> PASSED (1002ms) : Slow test 1 — simulating heavy I/O
-[Thread 10] AuthServiceTests.TestSlowOperation2 -> PASSED (1001ms) : Slow test 2 — simulating heavy computation
+[EVENT] WorkerCreated id=3 reason=scale-up
+[EVENT] ScaledUp id=3 reason=scale-up
+[Thread  9] AuthServiceTests.TestSlowOperation2 -> PASSED (1000ms) : Slow test 2 - simulating heavy computation
+[Thread 10] AuthServiceTests.TestSlowOperation1 -> PASSED (1001ms) : Slow test 1 - simulating heavy I/O
 [MONITOR] queue=0, active=3, busy=1, idle=2
-[Thread 33] AuthServiceTests.TestSlowOperation3 -> PASSED (1008ms) : Slow test 3 — simulating network call
-[MONITOR] queue=7, active=3, busy=3, idle=0
-[POOL] Worker 4 created (scale-up). Active=4 Queue=7
-[Thread 38] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
-[Thread 38] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
-[Thread 38] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (0ms) : Parameter count mismatch.
-[Thread 38] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
-[Thread 38] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
-[Thread 38] AuthServiceTests.TestTokenAsync -> PASSED (53ms)
-[Thread 38] AuthServiceTests.TestException -> PASSED (0ms)
-[Thread 11] AuthServiceTests.TestWithTimeoutPass -> PASSED (212ms) : Test with timeout — should pass
-[Thread 33] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (502ms) : Тест превысил таймаут 500ms
-[Thread 10] AuthServiceTests.TestSlowOperation4 -> PASSED (1007ms) : Slow test 4 — simulating database query
-[MONITOR] queue=0, active=4, busy=0, idle=4
-[MONITOR] queue=0, active=4, busy=0, idle=4
-[Thread 10] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread 38] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread 11] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread 33] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread 32] AuthServiceTests.TestSlowOperation3 -> PASSED (1002ms) : Slow test 3 - simulating network call
+[Thread 32] AuthServiceTests.TestLoginSuccess -> PASSED (1ms) : Checking successful login
+[Thread 32] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 32] AuthServiceTests.TestLoginParameterized(admin,wrong,False) -> PASSED (0ms)
+[Thread 32] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread 32] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[Thread 10] AuthServiceTests.TestExpressionAssert -> PASSED (17ms) : Expression tree assert demo
+[Thread 10] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 10] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[MONITOR] queue=0, active=3, busy=2, idle=1
+[Thread 32] AuthServiceTests.TestTokenAsync -> PASSED (54ms)
+[Thread  9] AuthServiceTests.TestSlowOperation4 -> PASSED (1006ms) : Slow test 4 - simulating database query
+[MONITOR] queue=0, active=3, busy=0, idle=3
+[MONITOR] queue=0, active=3, busy=0, idle=3
+[Thread 10] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (1ms) : Checking disk space calculation with different inputs
+[Thread 32] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (1ms) : Checking disk space calculation with different inputs
 [Thread 10] AuthServiceTests.TestNullProfile -> PASSED (0ms)
-[Thread 38] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
-[Thread 11] AuthServiceTests.TestConfigReference -> PASSED (0ms)
-[Thread 33] AuthServiceTests.TestContextUsage -> PASSED (0ms)
-[MONITOR] queue=0, active=4, busy=2, idle=2
-[Thread 38] AuthServiceTests.TestSlowOperation2 -> PASSED (1005ms) : Slow test 2 — simulating heavy computation
-[Thread 10] AuthServiceTests.TestSlowOperation1 -> PASSED (1006ms) : Slow test 1 — simulating heavy I/O
-[MONITOR] queue=0, active=4, busy=0, idle=4
-[POOL] Worker 5 created (scale-up). Active=5 Queue=6
-[Thread 60] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
-[Thread 60] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
-[Thread 60] AuthServiceTests.TestLoginParameterized(admin,wrong,wewef,False) -> FAILED (0ms) : Parameter count mismatch.
-[Thread 60] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
-[Thread 60] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
-[Thread 60] AuthServiceTests.TestTokenAsync -> PASSED (54ms)
-[Thread 11] AuthServiceTests.TestWithTimeoutPass -> PASSED (212ms) : Test with timeout — should pass
-[Thread 33] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (503ms) : Тест превысил таймаут 500ms
-[MONITOR] queue=0, active=5, busy=2, idle=3
-[Thread 10] AuthServiceTests.TestSlowOperation4 -> PASSED (1003ms) : Slow test 4 — simulating database query
-[Thread 38] AuthServiceTests.TestSlowOperation3 -> PASSED (1003ms) : Slow test 3 — simulating network call
-[MONITOR] queue=0, active=5, busy=0, idle=5
-[Thread 60] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
-[Thread 33] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread 32] AuthServiceTests.TestEmptySessions -> PASSED (0ms)
+[Thread 10] AuthServiceTests.TestConfigReference -> PASSED (0ms)
+[Thread  9] AuthServiceTests.TestContextUsage -> PASSED (0ms)
+[MONITOR] queue=0, active=3, busy=3, idle=0
+[Thread 32] AuthServiceTests.TestSlowOperation1 -> PASSED (1009ms) : Slow test 1 - simulating heavy I/O
+[Thread  9] AuthServiceTests.TestSlowOperation3 -> PASSED (1008ms) : Slow test 3 - simulating network call
+[Thread 10] AuthServiceTests.TestSlowOperation2 -> PASSED (1009ms) : Slow test 2 - simulating heavy computation
+[MONITOR] queue=0, active=3, busy=0, idle=3
+[Thread 10] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 32] AuthServiceTests.TestExpressionAssert -> PASSED (1ms) : Expression tree assert demo
+[Thread 10] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 32] AuthServiceTests.TestLoginParameterized(admin,wrong,False) -> PASSED (0ms)
+[Thread 10] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread 32] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[Thread 32] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 32] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 10] AuthServiceTests.TestTokenAsync -> PASSED (56ms)
+[MONITOR] queue=0, active=3, busy=1, idle=2
+[Thread  9] AuthServiceTests.TestSlowOperation4 -> PASSED (1002ms) : Slow test 4 - simulating database query
+[MONITOR] queue=0, active=3, busy=0, idle=3
+[Thread  9] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 32] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
 
 ИТОГИ
-Всего: 50 | Passed: 40 | Failed: 8 | Timeout: 2 | Время: 13021ms
-Демонстрация динамического пула завершена.
-[POOL] Worker 1 stopped. Active=4
-[POOL] Worker 5 stopped. Active=3
-[POOL] Worker 2 stopped. Active=2
+Всего: 50 | Passed: 45 | Failed: 5 | Timeout: 0 | Время: 13026ms
 [POOL] Worker 3 stopped. Active=1
-[POOL] Worker 4 stopped. Active=0
+[EVENT] WorkerStopped id=3 reason=stop
+[POOL] Worker 2 stopped. Active=0
+[EVENT] WorkerStopped id=2 reason=stop
+[POOL] Worker 1 stopped. Active=0
+[EVENT] WorkerStopped id=1 reason=stop
+
+===== SCENARIO 2: Only Smoke, Priority<=1 =====
+После фильтрации (делегат): 3
+Сформировано запусков тестов: 30
+[POOL] Worker 1 created (initial). Active=1 Queue=0
+[POOL] Worker 2 created (initial). Active=2 Queue=0
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 67] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 66] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 67] AuthServiceTests.TestException -> PASSED (0ms)
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 66] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 67] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 66] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 67] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 66] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 67] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 66] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 67] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 66] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 67] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 66] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 67] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 66] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 67] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 66] AuthServiceTests.TestException -> PASSED (0ms)
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 67] AuthServiceTests.TestLoginSuccess -> PASSED (2ms) : Checking successful login
+[Thread 66] AuthServiceTests.TestLoginFail -> PASSED (2ms) : Checking failed login
+[Thread 67] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 66] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 67] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 66] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 67] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[Thread 66] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 67] AuthServiceTests.TestException -> PASSED (0ms)
+[Thread 66] AuthServiceTests.TestLoginSuccess -> PASSED (0ms) : Checking successful login
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 67] AuthServiceTests.TestLoginFail -> PASSED (0ms) : Checking failed login
+[Thread 66] AuthServiceTests.TestException -> PASSED (0ms)
+
+ИТОГИ
+Всего: 30 | Passed: 30 | Failed: 0 | Timeout: 0 | Время: 8395ms
+[POOL] Worker 2 stopped. Active=1
+[EVENT] WorkerStopped id=2 reason=stop
+[POOL] Worker 1 stopped. Active=0
+[EVENT] WorkerStopped id=1 reason=stop
+
+===== SCENARIO 3: Load+Timeout+Regression =====
+После фильтрации (делегат): 15
+Сформировано запусков тестов: 40
+[POOL] Worker 1 created (initial). Active=1 Queue=0
+[POOL] Worker 2 created (initial). Active=2 Queue=0
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 102] AuthServiceTests.TestLoginParameterized(admin,wrong,False) -> PASSED (0ms)
+[Thread 101] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread 101] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 102] AuthServiceTests.TestTokenAsync -> PASSED (62ms)
+[Thread 101] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 102] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 101] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[MONITOR] queue=0, active=2, busy=0, idle=2
+[Thread 102] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[MONITOR] queue=8, active=2, busy=2, idle=0
+[POOL] Worker 3 created (scale-up). Active=3 Queue=8
+[EVENT] WorkerCreated id=3 reason=scale-up
+[EVENT] ScaledUp id=3 reason=scale-up
+[POOL] Worker 4 created (scale-up). Active=4 Queue=7
+[EVENT] WorkerCreated id=4 reason=scale-up
+[EVENT] ScaledUp id=4 reason=scale-up
+[Thread 101] AuthServiceTests.TestSlowOperation2 -> PASSED (1006ms) : Slow test 2 - simulating heavy computation
+[Thread 102] AuthServiceTests.TestSlowOperation1 -> PASSED (1006ms) : Slow test 1 - simulating heavy I/O
+[Thread 101] AuthServiceTests.TestWithTimeoutPass -> PASSED (212ms) : Test with timeout - should pass
+[Thread 101] AuthServiceTests.TestExpressionAssert -> PASSED (1ms) : Expression tree assert demo
+[Thread 101] AuthServiceTests.TestLoginParameterized(admin,wrong,False) -> PASSED (0ms)
+[Thread 101] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread 101] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (0ms) : Expected True, but got False
+[MONITOR] queue=0, active=4, busy=3, idle=1
+[Thread 116] AuthServiceTests.TestSlowOperation3 -> PASSED (1003ms) : Slow test 3 - simulating network call
+[Thread 102] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (501ms) : Тест превысил таймаут 500ms
+[Thread 118] AuthServiceTests.TestSlowOperation4 -> PASSED (1004ms) : Slow test 4 - simulating database query
+[Thread 101] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 118] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 102] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 101] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread 116] AuthServiceTests.TestTokenAsync -> PASSED (61ms)
+[POOL] Worker 5 created (scale-up). Active=5 Queue=2
+[EVENT] WorkerCreated id=5 reason=scale-up
+[EVENT] ScaledUp id=5 reason=scale-up
+[MONITOR] queue=2, active=5, busy=4, idle=1
+[Thread 116] AuthServiceTests.TestWithTimeoutPass -> PASSED (212ms) : Test with timeout - should pass
+[Thread 101] AuthServiceTests.TestSlowOperation3 -> PASSED (1008ms) : Slow test 3 - simulating network call
+[Thread 118] AuthServiceTests.TestSlowOperation1 -> PASSED (1010ms) : Slow test 1 - simulating heavy I/O
+[Thread 102] AuthServiceTests.TestSlowOperation2 -> PASSED (1009ms) : Slow test 2 - simulating heavy computation
+[MONITOR] queue=0, active=5, busy=1, idle=4
+[Thread 134] AuthServiceTests.TestSlowOperation4 -> PASSED (1010ms) : Slow test 4 - simulating database query
+[MONITOR] queue=0, active=5, busy=0, idle=5
+[Thread 101] AuthServiceTests.TestLoginParameterized(guest,123,False) -> PASSED (0ms)
+[Thread 134] AuthServiceTests.TestLoginParameterized(admin,wrong,False) -> PASSED (0ms)
+[Thread 102] AuthServiceTests.TestLoginParameterized(guest,123,True) -> FAILED (1ms) : Expected True, but got False
+[Thread 116] AuthServiceTests.TestExpressionAssert -> PASSED (1ms) : Expression tree assert demo
+[Thread 134] AuthServiceTests.TestCalculationMath(5,100,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 102] AuthServiceTests.TestCalculationMath(10,50,400) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 116] AuthServiceTests.TestCalculationMath(2,1000,1500) -> PASSED (0ms) : Checking disk space calculation with different inputs
+[Thread 134] AuthServiceTests.TestCalculationMath(3,30,100) -> FAILED (0ms) : 90 is not greater than 100
+[Thread 101] AuthServiceTests.TestTokenAsync -> PASSED (59ms)
+[Thread 118] AuthServiceTests.TestWithTimeoutFail -> TIMEOUT (504ms) : Тест превысил таймаут 500ms
+[MONITOR] queue=0, active=5, busy=0, idle=5
+[MONITOR] queue=0, active=5, busy=0, idle=5
+[MONITOR] queue=0, active=5, busy=2, idle=3
+[Thread 118] AuthServiceTests.TestSlowOperation1 -> PASSED (1007ms) : Slow test 1 - simulating heavy I/O
+[Thread 116] AuthServiceTests.TestSlowOperation2 -> PASSED (1007ms) : Slow test 2 - simulating heavy computation
+
+ИТОГИ
+Всего: 40 | Passed: 32 | Failed: 6 | Timeout: 2 | Время: 11610ms
+[POOL] Worker 5 stopped. Active=4
+[EVENT] WorkerStopped id=5 reason=stop
+[POOL] Worker 1 stopped. Active=3
+[EVENT] WorkerStopped id=1 reason=stop
+[POOL] Worker 3 stopped. Active=2
+[EVENT] WorkerStopped id=3 reason=stop
+[POOL] Worker 4 stopped. Active=1
+[EVENT] WorkerStopped id=4 reason=stop
+[POOL] Worker 2 stopped. Active=0
+[EVENT] WorkerStopped id=2 reason=stop

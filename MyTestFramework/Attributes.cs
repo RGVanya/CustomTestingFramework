@@ -20,6 +20,34 @@ namespace MyTestFramework
         public TestCaseAttribute(params object[] parameters) => Parameters = parameters;
     }
 
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class TestCaseSourceAttribute : Attribute
+    {
+        public string SourceName { get; }
+        public TestCaseSourceAttribute(string sourceName) => SourceName = sourceName;
+    }
+
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class CategoryAttribute : Attribute
+    {
+        public string Name { get; }
+        public CategoryAttribute(string name) => Name = name;
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class PriorityAttribute : Attribute
+    {
+        public int Level { get; }
+        public PriorityAttribute(int level) => Level = level;
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class AuthorAttribute : Attribute
+    {
+        public string Name { get; }
+        public AuthorAttribute(string name) => Name = name;
+    }
+
     // Жизненный цикл теста
     [AttributeUsage(AttributeTargets.Method)] public class BeforeEachAttribute : Attribute { }
     [AttributeUsage(AttributeTargets.Method)] public class AfterEachAttribute : Attribute { }

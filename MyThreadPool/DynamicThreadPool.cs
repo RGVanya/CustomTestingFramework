@@ -7,6 +7,11 @@ namespace MyThreadPool;
 
 public sealed class DynamicThreadPool : IDisposable
 {
+    public event EventHandler<PoolEventArgs>? WorkerCreated;
+    public event EventHandler<PoolEventArgs>? WorkerStopped;
+    public event EventHandler<PoolEventArgs>? ScaledUp;
+    public event EventHandler<PoolTaskFailedEventArgs>? TaskFailed;
+
     private readonly Queue<WorkItem> _queue = new();
     private readonly List<WorkerState> _workers = new();
     private readonly object _lock = new();
@@ -300,6 +305,7 @@ public sealed class DynamicThreadPool : IDisposable
             catch (Exception ex)
             {
                 _log?.Invoke($"[POOL][ERROR] Worker {state.WorkerId} task failed: {ex.Message}");
+                TaskFailed?.Invoke(this, new PoolTaskFailedEventArgs(state.WorkerId, ex));
             }
             finally
             {
@@ -331,6 +337,11 @@ public sealed class DynamicThreadPool : IDisposable
         thread.Start();
 
         _log?.Invoke($"[POOL] Worker {workerId} created ({reason}). Active={CountAliveWorkersLocked()} Queue={_queue.Count}");
+        WorkerCreated?.Invoke(this, new PoolEventArgs(workerId, reason));
+        if (reason is "scale-up" or "hung-replacement")
+        {
+            ScaledUp?.Invoke(this, new PoolEventArgs(workerId, reason));
+        }
     }
 
     private void WorkerEntry(WorkerState state)
@@ -362,6 +373,7 @@ public sealed class DynamicThreadPool : IDisposable
                 state.IsExecuting = false;
                 state.CurrentTaskStartedAtUtc = null;
                 _log?.Invoke($"[POOL] Worker {state.WorkerId} stopped. Active={CountAliveWorkersLocked()}");
+                WorkerStopped?.Invoke(this, new PoolEventArgs(state.WorkerId, "stop"));
             }
         }
     }
@@ -422,4 +434,27 @@ public sealed class DynamicThreadPool : IDisposable
 }
 
 public readonly record struct PoolSnapshot(int QueueLength, int ActiveWorkers, int BusyWorkers, int IdleWorkers);
+public sealed class PoolEventArgs : EventArgs
+{
+    public PoolEventArgs(int workerId, string reason)
+    {
+        WorkerId = workerId;
+        Reason = reason;
+    }
+
+    public int WorkerId { get; }
+    public string Reason { get; }
+}
+
+public sealed class PoolTaskFailedEventArgs : EventArgs
+{
+    public PoolTaskFailedEventArgs(int workerId, Exception exception)
+    {
+        WorkerId = workerId;
+        Exception = exception;
+    }
+
+    public int WorkerId { get; }
+    public Exception Exception { get; }
+}
 

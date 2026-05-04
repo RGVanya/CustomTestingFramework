@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
@@ -21,16 +22,53 @@ internal class Program
             .Where(t => t.GetCustomAttribute<TestClassAttribute>() is not null)
             .ToList();
 
-        var baseItems = CollectTestItems(testClasses);
-        logger.LogInfo($"Найдено тестовых классов: {testClasses.Count}");
-        logger.LogInfo($"Найдено тестовых методов (c учетом TestCase): {baseItems.Count}");
+        var allItems = CollectTestItems(testClasses);
 
-        var plan = BuildLoadPlan(baseItems, requiredRuns: 50);
+        logger.LogInfo($"Найдено тестовых классов: {testClasses.Count}");
+        logger.LogInfo($"Найдено тестовых методов/кейсов всего: {allItems.Count}");
+        RunScenario(
+            "SCENARIO 1: Smoke+Load+Priority<=2+Author=Student",
+            allItems,
+            item => item.Categories.Contains("Smoke")
+                    || item.Categories.Contains("Load")
+                    || (item.Priority.HasValue && item.Priority.Value <= 2)
+                    || string.Equals(item.Author, "Student", StringComparison.OrdinalIgnoreCase),
+            requiredRuns: 50,
+            logger: logger);
+
+        RunScenario(
+            "SCENARIO 2: Only Smoke, Priority<=1",
+            allItems,
+            item => item.Categories.Contains("Smoke") && item.Priority.GetValueOrDefault(99) <= 1,
+            requiredRuns: 30,
+            logger: logger);
+
+        RunScenario(
+            "SCENARIO 3: Load+Timeout+Regression",
+            allItems,
+            item => item.Categories.Contains("Load")
+                    || item.Categories.Contains("Timeout")
+                    || item.Categories.Contains("Regression"),
+            requiredRuns: 40,
+            logger: logger);
+    }
+
+    static void RunScenario(string title, List<TestItem> allItems, Func<TestItem, bool> filter, int requiredRuns, ThreadSafeTestLogger logger)
+    {
+        logger.LogInfo($"\n===== {title} =====");
+        var baseItems = allItems.Where(filter).ToList();
+        logger.LogInfo($"После фильтрации (делегат): {baseItems.Count}");
+        if (baseItems.Count == 0)
+        {
+            logger.LogInfo("Нет тестов для запуска в этом сценарии.");
+            return;
+        }
+
+        var plan = BuildLoadPlan(baseItems, requiredRuns);
         logger.LogInfo($"Сформировано запусков тестов: {plan.TotalItems}");
 
         var results = new ConcurrentBag<TestResult>();
-        var remaining = new CountdownEvent(plan.TotalItems);
-
+        using var remaining = new CountdownEvent(plan.TotalItems);
         using var pool = new DynamicThreadPool(
             minWorkers: 2,
             maxWorkers: 8,
@@ -40,16 +78,16 @@ internal class Program
             hungTaskThreshold: TimeSpan.FromSeconds(5),
             log: logger.LogInfo);
 
+        pool.WorkerCreated += (_, e) => logger.LogInfo($"[EVENT] WorkerCreated id={e.WorkerId} reason={e.Reason}");
+        pool.WorkerStopped += (_, e) => logger.LogInfo($"[EVENT] WorkerStopped id={e.WorkerId} reason={e.Reason}");
+        pool.ScaledUp += (_, e) => logger.LogInfo($"[EVENT] ScaledUp id={e.WorkerId} reason={e.Reason}");
+        pool.TaskFailed += (_, e) => logger.LogInfo($"[EVENT] TaskFailed worker={e.WorkerId} error={e.Exception.Message}");
+
         using var monitorStop = new CancellationTokenSource();
-        var monitor = new Thread(() => MonitorPoolLoop(pool, logger, monitorStop.Token))
-        {
-            IsBackground = true,
-            Name = "PoolMonitor"
-        };
+        var monitor = new Thread(() => MonitorPoolLoop(pool, logger, monitorStop.Token)) { IsBackground = true, Name = "PoolMonitor" };
         monitor.Start();
 
         var totalSw = Stopwatch.StartNew();
-
         foreach (var batch in plan.Batches)
         {
             foreach (var item in batch.Items)
@@ -73,21 +111,14 @@ internal class Program
                 });
             }
 
-            if (batch.DelayAfterMs > 0)
-            {
-                Thread.Sleep(batch.DelayAfterMs);
-            }
+            if (batch.DelayAfterMs > 0) Thread.Sleep(batch.DelayAfterMs);
         }
 
         remaining.Wait();
         totalSw.Stop();
-
         monitorStop.Cancel();
         monitor.Join(TimeSpan.FromSeconds(2));
-
-        var finalResults = results.ToList();
-        PrintSummary(finalResults, totalSw.ElapsedMilliseconds, logger);
-        logger.LogInfo("Демонстрация динамического пула завершена.");
+        PrintSummary(results.ToList(), totalSw.ElapsedMilliseconds, logger);
     }
 
     static void MonitorPoolLoop(DynamicThreadPool pool, ThreadSafeTestLogger logger, CancellationToken token)
@@ -114,20 +145,17 @@ internal class Program
 
         var idx = 0;
 
-        // Одиночные подачи
         for (var i = 0; i < 8 && idx < generated.Count; i++)
         {
             batches.Add(new LoadBatch(new[] { generated[idx++] }, DelayAfterMs: 450));
         }
 
-        // Пиковая нагрузка
         while (idx < generated.Count)
         {
             var take = Math.Min(10, generated.Count - idx);
             batches.Add(new LoadBatch(generated.Skip(idx).Take(take).ToArray(), DelayAfterMs: 100));
             idx += take;
 
-            // Период бездействия между волнами
             if (idx < generated.Count)
             {
                 batches.Add(new LoadBatch(Array.Empty<TestItem>(), DelayAfterMs: 2200));
@@ -146,16 +174,16 @@ internal class Program
             foreach (var method in type.GetMethods())
             {
                 var testAttr = method.GetCustomAttribute<TestMethodAttribute>();
-                var testCases = method.GetCustomAttributes<TestCaseAttribute>().ToList();
-
-                if (testAttr is null && !testCases.Any())
+                if (testAttr is null && !method.GetCustomAttributes<TestCaseAttribute>().Any() && !method.GetCustomAttributes<TestCaseSourceAttribute>().Any())
                 {
                     continue;
                 }
 
-                var cases = testCases.Any()
-                    ? testCases.Select(c => c.Parameters).ToList()
-                    : new List<object[]?> { null };
+                var cases = ResolveCases(type, method);
+                var timeout = method.GetCustomAttribute<TimeoutAttribute>()?.Milliseconds;
+                var categories = method.GetCustomAttributes<CategoryAttribute>().Select(c => c.Name).ToArray();
+                var priority = method.GetCustomAttribute<PriorityAttribute>()?.Level;
+                var author = method.GetCustomAttribute<AuthorAttribute>()?.Name;
 
                 foreach (var args in cases)
                 {
@@ -165,13 +193,59 @@ internal class Program
                         Method = method,
                         TestAttribute = testAttr,
                         Arguments = args,
-                        TimeoutMs = method.GetCustomAttribute<TimeoutAttribute>()?.Milliseconds
+                        TimeoutMs = timeout,
+                        Categories = categories,
+                        Priority = priority,
+                        Author = author
                     });
                 }
             }
         }
 
         return items;
+    }
+
+    static List<object[]?> ResolveCases(Type classType, MethodInfo method)
+    {
+        var directCases = method.GetCustomAttributes<TestCaseAttribute>()
+            .Select(c => c.Parameters)
+            .Cast<object[]?>()
+            .ToList();
+
+        foreach (var source in method.GetCustomAttributes<TestCaseSourceAttribute>())
+        {
+            var provider = classType.GetMethod(source.SourceName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new InvalidOperationException($"TestCaseSource method '{source.SourceName}' not found for {classType.Name}.{method.Name}");
+
+            var value = provider.Invoke(null, null)
+                ?? throw new InvalidOperationException($"TestCaseSource '{source.SourceName}' returned null");
+
+            if (value is IEnumerable enumerable)
+            {
+                foreach (var entry in enumerable)
+                {
+                    if (entry is object[] arr)
+                    {
+                        directCases.Add(arr);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"TestCaseSource '{source.SourceName}' must yield object[]");
+                    }
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException($"TestCaseSource '{source.SourceName}' must implement IEnumerable");
+            }
+        }
+
+        if (directCases.Count == 0)
+        {
+            directCases.Add(null);
+        }
+
+        return directCases;
     }
 
     static TestResult ExecuteSingleTest(TestItem item)
@@ -283,8 +357,10 @@ internal sealed class TestItem
     public TestMethodAttribute? TestAttribute { get; init; }
     public object[]? Arguments { get; init; }
     public int? TimeoutMs { get; init; }
+    public string[] Categories { get; init; } = Array.Empty<string>();
+    public int? Priority { get; init; }
+    public string? Author { get; init; }
 }
 
 internal sealed record LoadBatch(IReadOnlyList<TestItem> Items, int DelayAfterMs);
 internal sealed record LoadPlan(IReadOnlyList<LoadBatch> Batches, int TotalItems);
-
